@@ -4,24 +4,22 @@ from datetime import datetime
 import os
 
 # CONFIGURAÇÕES (lidas do GitHub Actions via Secrets)
-ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
-PHONE_NUMBER_ID = os.environ["PHONE_NUMBER_ID"]
-DESTINO = os.environ["DESTINO"]
+GOOGLE_SCRIPT_URL = os.environ["GOOGLE_SCRIPT_URL"]  # URL do Apps Script
 
-# Função para enviar mensagem no WhatsApp
-def send_whatsapp_message(message):
-    url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
+# Função para enviar dados para o Google Sheets
+def send_to_google_sheet(time_str, world="Venebra"):
     payload = {
-        "messaging_product": "whatsapp",
-        "to": DESTINO,
-        "type": "text",
-        "text": {"body": message}
+        "time": time_str,
+        "server": world
     }
-    requests.post(url, headers=headers, json=payload)
+    try:
+        response = requests.post(GOOGLE_SCRIPT_URL, json=payload)
+        if response.status_code == 200:
+            print("Informação registrada no Google Sheets com sucesso.")
+        else:
+            print(f"Falha ao registrar no Sheets: {response.status_code}, {response.text}")
+    except Exception as e:
+        print(f"Erro ao enviar para o Sheets: {e}")
 
 # Função para checar status do mundo
 def check_world_status(world="Venebra"):
@@ -36,9 +34,8 @@ def monitor_boot():
         status = check_world_status()
         if status == "online":
             boot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            msg = f"Mundo voltou online! Boot detectado em: {boot_time}"
-            print(msg)
-            send_whatsapp_message(msg)
+            print(f"Mundo voltou online! Boot detectado em: {boot_time}")
+            send_to_google_sheet(boot_time)
             break
         time.sleep(1)  # Checa a cada 1 segundo
 
