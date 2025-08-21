@@ -32,4 +32,4 @@ jobs:
         env:
           GOOGLE_SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_URL }}
         run: |
-          python monitor_boot.py
+          python tibia_boot.py
