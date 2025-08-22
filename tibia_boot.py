@@ -19,7 +19,7 @@ def send_to_google_sheet(time_str, world=WORLD):
         "server": world
     }
     try:
-        response = requests.post(GOOGLE_SCRIPT_URL, json=payload, timeout=10)
+        response = requests.post(GOOGLE_SCRIPT_URL, json=payload, timeout=1)
         if response.status_code == 200:
             print(f"Informação registrada no Google Sheets: {time_str}")
         else:
@@ -31,7 +31,7 @@ def send_to_google_sheet(time_str, world=WORLD):
 def check_world_status(world=WORLD):
     url = f"https://api.tibiadata.com/v4/world/{world}"
     try:
-        resp = requests.get(url, timeout=5)
+        resp = requests.get(url, timeout=1)
         resp.raise_for_status()
         data = resp.json()
         return data["world"]["status"]
@@ -58,3 +58,4 @@ def monitor_boot():
 
 if __name__ == "__main__":
     monitor_boot()
+
