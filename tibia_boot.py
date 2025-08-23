@@ -10,7 +10,7 @@ if not GOOGLE_SCRIPT_URL:
 
 WORLD = "Venebra"
 CHECK_INTERVAL = 1  # segundos entre cada checagem
-MAX_ATTEMPTS = 3600  # número máximo de tentativas (ex: 3600 x 1s = ~1h)
+MAX_ATTEMPTS = 7200  # número máximo de tentativas (ex: 3600 x 1s = ~1h)
 
 # Função para enviar dados para o Google Sheets
 def send_to_google_sheet(time_str, world=WORLD):
@@ -58,4 +58,5 @@ def monitor_boot():
 
 if __name__ == "__main__":
     monitor_boot()
+
 
