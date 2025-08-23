@@ -10,7 +10,7 @@ if not GOOGLE_SCRIPT_URL:
 
 WORLD = "Venebra"
 CHECK_INTERVAL = 1  # segundos entre cada checagem
-MAX_ATTEMPTS = 7200  # número máximo de tentativas (ex: 3600 x 1s = ~1h)
+MAX_ATTEMPTS = 7200  # número máximo de tentativas (ex: 7200 x 1s = ~2h)
 
 # Função para enviar dados para o Google Sheets
 def send_to_google_sheet(time_str, world=WORLD):
@@ -39,24 +39,36 @@ def check_world_status(world=WORLD):
         print(f"Erro ao consultar API do Tibia: {e}")
         return "offline"  # assume offline se falhar
 
-# Monitorar server boot
+# Monitorar server boot (espera cair -> depois voltar)
 def monitor_boot():
     print(f"Aguardando server boot de {WORLD}...")
     attempts = 0
+    saw_offline = False  # flag: já detectou mundo offline?
+
     while attempts < MAX_ATTEMPTS:
         status = check_world_status()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if status == "online":
-            print(f"Mundo voltou online! Boot detectado em: {now}")
-            send_to_google_sheet(now)
-            return
+
+        if not saw_offline:
+            # Antes do server save: esperar o mundo cair
+            if status == "offline":
+                saw_offline = True
+                print(f"{now} - {WORLD} caiu (offline detectado).")
+            else:
+                print(f"{now} - {WORLD} ainda online (antes do SS). Tentativa {attempts+1}/{MAX_ATTEMPTS}")
         else:
-            print(f"{now} - {WORLD} ainda offline. Tentativa {attempts+1}/{MAX_ATTEMPTS}")
+            # Depois do server save: esperar o mundo voltar online
+            if status == "online":
+                print(f"Mundo voltou online! Boot detectado em: {now}")
+                send_to_google_sheet(now)
+                return
+            else:
+                print(f"{now} - {WORLD} ainda offline (aguardando boot). Tentativa {attempts+1}/{MAX_ATTEMPTS}")
+
         attempts += 1
         time.sleep(CHECK_INTERVAL)
+
     print(f"Máximo de tentativas atingido ({MAX_ATTEMPTS}). Script encerrado.")
 
 if __name__ == "__main__":
     monitor_boot()
-
-
