@@ -1,6 +1,6 @@
 import requests
 import time
-from datetime import datetime
+from datetime import datetime, time as dtime
 import os
 
 # CONFIGURAÇÕES
@@ -11,6 +11,7 @@ if not GOOGLE_SCRIPT_URL:
 WORLD = "Venebra"
 CHECK_INTERVAL = 1  # segundos entre cada checagem
 MAX_ATTEMPTS = 7200  # número máximo de tentativas (ex: 7200 x 1s = ~2h)
+SERVER_SAVE_TIME = dtime(5, 0, 0)  # 05:00:00 horário local do servidor
 
 # Função para enviar dados para o Google Sheets
 def send_to_google_sheet(time_str, world=WORLD):
@@ -39,7 +40,7 @@ def check_world_status(world=WORLD):
         print(f"Erro ao consultar API do Tibia: {e}")
         return "offline"  # assume offline se falhar
 
-# Monitorar server boot (espera cair -> depois voltar)
+# Monitorar server boot (espera cair -> depois voltar -> só registra após 05:00)
 def monitor_boot():
     print(f"Aguardando server boot de {WORLD}...")
     attempts = 0
@@ -47,7 +48,8 @@ def monitor_boot():
 
     while attempts < MAX_ATTEMPTS:
         status = check_world_status()
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_dt = datetime.now()
+        now = now_dt.strftime("%Y-%m-%d %H:%M:%S")
 
         if not saw_offline:
             # Antes do server save: esperar o mundo cair
@@ -58,10 +60,12 @@ def monitor_boot():
                 print(f"{now} - {WORLD} ainda online (antes do SS). Tentativa {attempts+1}/{MAX_ATTEMPTS}")
         else:
             # Depois do server save: esperar o mundo voltar online
-            if status == "online":
+            if status == "online" and now_dt.time() >= SERVER_SAVE_TIME:
                 print(f"Mundo voltou online! Boot detectado em: {now}")
                 send_to_google_sheet(now)
                 return
+            elif status == "online":
+                print(f"{now} - {WORLD} voltou online, mas antes das 05:00 → ignorado.")
             else:
                 print(f"{now} - {WORLD} ainda offline (aguardando boot). Tentativa {attempts+1}/{MAX_ATTEMPTS}")
 
