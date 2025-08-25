@@ -1,6 +1,7 @@
 import requests
 import time
 from datetime import datetime, time as dtime
+from zoneinfo import ZoneInfo  # para trabalhar com fuso horário
 import os
 
 # CONFIGURAÇÕES
@@ -11,7 +12,8 @@ if not GOOGLE_SCRIPT_URL:
 WORLD = "Venebra"
 CHECK_INTERVAL = 1  # segundos entre cada checagem
 MAX_ATTEMPTS = 7200  # número máximo de tentativas (ex: 7200 x 1s = ~2h)
-SERVER_SAVE_TIME = dtime(5, 0, 0)  # 05:00:00 horário local do servidor
+TZ = ZoneInfo("America/Sao_Paulo")  # GMT-3 com horário de verão ajustado
+SERVER_SAVE_TIME = dtime(5, 0, 0)  # 05:00:00 no fuso definido
 
 # Função para enviar dados para o Google Sheets
 def send_to_google_sheet(time_str, world=WORLD):
@@ -40,15 +42,15 @@ def check_world_status(world=WORLD):
         print(f"Erro ao consultar API do Tibia: {e}")
         return "offline"  # assume offline se falhar
 
-# Monitorar server boot (espera cair -> depois voltar -> só registra após 05:00)
+# Monitorar server boot (espera cair -> depois voltar -> só registra após 05:00 GMT-3)
 def monitor_boot():
-    print(f"Aguardando server boot de {WORLD}...")
+    print(f"Aguardando server boot de {WORLD} (horário GMT-3)...")
     attempts = 0
     saw_offline = False  # flag: já detectou mundo offline?
 
     while attempts < MAX_ATTEMPTS:
         status = check_world_status()
-        now_dt = datetime.now()
+        now_dt = datetime.now(TZ)  # pega horário no GMT-3
         now = now_dt.strftime("%Y-%m-%d %H:%M:%S")
 
         if not saw_offline:
