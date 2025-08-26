@@ -1,6 +1,6 @@
 name: Monitor Server Boot
 
-# Agendamento para rodar todo dia às 04:15 GMT-3 (07:15 UTC)
+# Agendamento para rodar todo dia às 05:02 GMT-3 (08:02 UTC)
 on:
   schedule:
     - cron: '2 8 * * *' 
