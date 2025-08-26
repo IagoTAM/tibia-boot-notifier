@@ -3,7 +3,7 @@ name: Monitor Server Boot
 # Agendamento para rodar todo dia às 04:15 GMT-3 (07:15 UTC)
 on:
   schedule:
-    - cron: '15 7 * * *' 
+    - cron: '2 8 * * *' 
   workflow_dispatch:
 
 jobs:
