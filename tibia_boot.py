@@ -22,9 +22,9 @@ if not GOOGLE_SCRIPT_URL:
   
 WORLD = "Venebra"
   
-CHECK_INTERVAL = 10  # segundos entre cada checagem
+CHECK_INTERVAL = 5  # segundos entre cada checagem
   
-MAX_ATTEMPTS = 360  # número máximo de tentativas (ex: 360 x 10s = ~1h)
+MAX_ATTEMPTS = 720  # número máximo de tentativas (ex: 720 x 5s = ~1h)
   
 TZ = ZoneInfo("America/Sao_Paulo")  # GMT-3 com horário de verão ajustado
   
@@ -46,7 +46,7 @@ def send_to_google_sheet(time_str, world=WORLD):
   
     try:
   
-        response = requests.post(GOOGLE_SCRIPT_URL, json=payload, timeout=10)
+        response = requests.post(GOOGLE_SCRIPT_URL, json=payload, timeout=5)
   
         if response.status_code == 200:
   
@@ -70,7 +70,7 @@ def check_world_status(world=WORLD):
   
     try:
   
-        resp = requests.get(url, timeout=10)
+        resp = requests.get(url, timeout=5)
   
         resp.raise_for_status()
   
