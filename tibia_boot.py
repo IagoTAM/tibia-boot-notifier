@@ -104,7 +104,7 @@ def monitor_boot():
   
         now_dt = datetime.now(TZ)  # pega horário no GMT-3
   
-        now = now_dt.strftime("%Y-%m-%d %H:%M:%S")
+        now = now_dt.strftime("%H:%M:%S")
   
 
   
