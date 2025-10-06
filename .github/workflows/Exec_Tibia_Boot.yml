@@ -2,7 +2,7 @@ name: Tibia Boot Monitor
 
 on:
   schedule:
-    - cron: '30 7 * * *'  # 04:30 GMT-3 → 07:30 UTC
+    - cron: '50 7 * * *'  # 04:50 GMT-3 → 05:30 UTC
   workflow_dispatch:       # permite rodar manualmente também
 
 jobs:
