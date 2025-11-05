@@ -28,7 +28,7 @@ MAX_ATTEMPTS = 1200  # número máximo de tentativas (ex: 1200 x 3s = ~1h)
   
 TZ = ZoneInfo("America/Sao_Paulo")  # GMT-3 com horário de verão ajustado
   
-SERVER_SAVE_TIME = dtime(5, 0, 30)  # 05:00:30 no fuso definido
+SERVER_SAVE_TIME = dtime(6, 0, 30)  # 06:00:30 no fuso definido
   
 
   
